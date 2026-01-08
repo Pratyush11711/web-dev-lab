@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Task Manager</title>
+  <style>
+    .board { display: flex; gap: 20px; }
+    .column {
+      width: 30%;
+      min-height: 200px;
+      border: 2px dashed #333;
+      padding: 10px;
+    }
+    .task {
+      background: #ddd;
+      margin: 5px;
+      padding: 10px;
+      cursor: grab;
+    }
+  </style>
+</head>
+<body>
+
+<input type="text" id="taskInput" placeholder="Enter task">
+<button onclick="addTask()">Add Task</button>
+
+<div class="board">
+  <div class="column" ondrop="drop(event)" ondragover="allowDrop(event)">
+    <h3>To Do</h3>
+  </div>
+  <div class="column" ondrop="drop(event)" ondragover="allowDrop(event)">
+    <h3>In Progress</h3>
+  </div>
+  <div class="column" ondrop="drop(event)" ondragover="allowDrop(event)">
+    <h3>Completed</h3>
+  </div>
+</div>
+
+<script>
+  let id = 0;
+
+  function addTask() {
+    const taskText = document.getElementById("taskInput").value;
+    if (!taskText) return;
+
+    const task = document.createElement("div");
+    task.className = "task";
+    task.id = "task" + id++;
+    task.draggable = true;
+    task.ondragstart = drag;
+    task.innerHTML = taskText + "<br>" + new Date().toLocaleDateString();
+
+    document.querySelector(".column").appendChild(task);
+    document.getElementById("taskInput").value = "";
+  }
+
+  function allowDrop(e) {
+    e.preventDefault();
+  }
+
+  function drag(e) {
+    e.dataTransfer.setData("text", e.target.id);
+  }
+
+  function drop(e) {
+    e.preventDefault();
+    const data = e.dataTransfer.getData("text");
+    const task = document.getElementById(data);
+    e.target.appendChild(task);
+
+    if (e.target.innerText.includes("Completed")) {
+      task.style.background = "lightgreen";
+      alert("Task Completed Successfully");
+    }
+  }
+</script>
+
+</body>
+</html>
