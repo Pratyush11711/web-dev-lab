@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Multi-Stage Form</title>
+  <style>
+    body { font-family: Arial; }
+    .stage { display: none; }
+    .error { color: red; font-size: 14px; }
+    #progressBar {
+      width: 100%;
+      background: #ddd;
+      margin-bottom: 15px;
+    }
+    #progress {
+      height: 20px;
+      width: 0%;
+      background: green;
+      text-align: center;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+<h2>📝 Multi-Stage Registration Form</h2>
+
+<div id="progressBar">
+  <div id="progress">0%</div>
+</div>
+
+<form id="multiForm">
+
+  <!-- Stage 1 -->
+  <div class="stage">
+    <h3>Stage 1: Personal Info</h3>
+    Name: <input type="text" id="name"><br>
+    <span class="error" id="e1"></span>
+  </div>
+
+  <!-- Stage 2 -->
+  <div class="stage">
+    <h3>Stage 2: Contact Info</h3>
+    Email: <input type="email" id="email"><br>
+    <span class="error" id="e2"></span>
+  </div>
+
+  <!-- Stage 3 -->
+  <div class="stage">
+    <h3>Stage 3: Security</h3>
+    Password: <input type="password" id="password"><br>
+    <span class="error" id="e3"></span>
+  </div>
+
+  <!-- Stage 4 -->
+  <div class="stage">
+    <h3>Stage 4: Confirmation</h3>
+    Confirm Password: <input type="password" id="confirm"><br>
+    <span class="error" id="e4"></span>
+  </div>
+
+</form>
+
+<br>
+<button onclick="prevStage()">Previous</button>
+<button onclick="nextStage()">Next</button>
+
+<script>
+/* ---------- VARIABLES ---------- */
+let currentStage = 0;
+let stages = document.getElementsByClassName("stage");
+
+/* Temporary data storage */
+let formData = {
+  name: "",
+  email: "",
+  password: ""
+};
+
+/* ---------- INITIAL DISPLAY ---------- */
+showStage();
+
+/* ---------- SHOW STAGE ---------- */
+function showStage() {
+  for (let i = 0; i < stages.length; i++) {
+    stages[i].style.display = "none";
+  }
+  stages[currentStage].style.display = "block";
+  updateProgress();
+}
+
+/* ---------- NEXT BUTTON ---------- */
+function nextStage() {
+  if (!validateStage()) return;
+
+  if (currentStage < stages.length - 1) {
+    currentStage++;
+    showStage();
+  } else {
+    alert("Form Submitted Successfully!");
+  }
+}
+
+/* ---------- PREVIOUS BUTTON ---------- */
+function prevStage() {
+  if (currentStage > 0) {
+    currentStage--;
+    showStage();
+  }
+}
+
+/* ---------- VALIDATION PER STAGE ---------- */
+function validateStage() {
+  let valid = true;
+
+  document.querySelectorAll(".error").forEach(e => e.textContent = "");
+
+  if (currentStage === 0) {
+    let name = document.getElementById("name").value.trim();
+    if (name === "") {
+      document.getElementById("e1").textContent = "Name is required";
+      valid = false;
+    } else {
+      formData.name = name;
+    }
+  }
+
+  if (currentStage === 1) {
+    let email = document.getElementById("email").value.trim();
+    if (!email.includes("@")) {
+      document.getElementById("e2").textContent = "Enter valid email";
+      valid = false;
+    } else {
+      formData.email = email;
+    }
+  }
+
+  if (currentStage === 2) {
+    let pass = document.getElementById("password").value;
+    if (pass.length < 6) {
+      document.getElementById("e3").textContent = "Minimum 6 characters";
+      valid = false;
+    } else {
+      formData.password = pass;
+    }
+  }
+
+  if (currentStage === 3) {
+    let confirm = document.getElementById("confirm").value;
+    if (confirm !== formData.password) {
+      document.getElementById("e4").textContent = "Passwords do not match";
+      valid = false;
+    }
+  }
+
+  return valid;
+}
+
+/* ---------- PROGRESS BAR ---------- */
+function updateProgress() {
+  let percent = ((currentStage + 1) / stages.length) * 100;
+  let bar = document.getElementById("progress");
+  bar.style.width = percent + "%";
+  bar.textContent = Math.round(percent) + "%";
+}
+</script>
+
+</body>
+</html>

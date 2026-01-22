@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dynamic Survey Builder</title>
+  <style>
+    body { font-family: Arial; }
+    .error { color: red; font-size: 14px; }
+    .question { margin-bottom: 15px; }
+  </style>
+</head>
+<body>
+
+<h2>📋 Survey Form</h2>
+
+<form id="surveyForm"></form>
+
+<button onclick="validateSurvey()">Submit Survey</button>
+
+<script>
+/* ---------- QUESTION STRUCTURE ---------- */
+let questions = [
+  {
+    id: 1,
+    question: "Enter your name",
+    type: "text",
+    required: true,
+    maxLength: 20
+  },
+  {
+    id: 2,
+    question: "Select your gender",
+    type: "radio",
+    required: true,
+    options: ["Male", "Female", "Other"]
+  },
+  {
+    id: 3,
+    question: "Select your skills (min 1, max 2)",
+    type: "checkbox",
+    required: true,
+    minSelect: 1,
+    maxSelect: 2,
+    options: ["Java", "JavaScript", "Python"]
+  }
+];
+
+/* ---------- FORM GENERATION ---------- */
+let form = document.getElementById("surveyForm");
+
+questions.forEach((q, index) => {
+  let div = document.createElement("div");
+  div.className = "question";
+  div.innerHTML = `<strong>${q.question}</strong><br>`;
+
+  if (q.type === "text") {
+    div.innerHTML += `
+      <input type="text" id="q${index}">
+      <span class="error" id="e${index}"></span>
+    `;
+  }
+
+  if (q.type === "radio") {
+    q.options.forEach(opt => {
+      div.innerHTML += `
+        <input type="radio" name="q${index}" value="${opt}"> ${opt}
+      `;
+    });
+    div.innerHTML += `<br><span class="error" id="e${index}"></span>`;
+  }
+
+  if (q.type === "checkbox") {
+    q.options.forEach(opt => {
+      div.innerHTML += `
+        <input type="checkbox" name="q${index}" value="${opt}"> ${opt}
+      `;
+    });
+    div.innerHTML += `<br><span class="error" id="e${index}"></span>`;
+  }
+
+  form.appendChild(div);
+});
+
+/* ---------- VALIDATION FUNCTION ---------- */
+function validateSurvey() {
+  let valid = true;
+
+  questions.forEach((q, index) => {
+    let error = document.getElementById(`e${index}`);
+    error.textContent = "";
+
+    // TEXT VALIDATION
+    if (q.type === "text") {
+      let value = document.getElementById(`q${index}`).value.trim();
+      if (q.required && value === "") {
+        error.textContent = "This field is required";
+        valid = false;
+      } else if (value.length > q.maxLength) {
+        error.textContent = "Maximum " + q.maxLength + " characters allowed";
+        valid = false;
+      }
+    }
+
+    // RADIO VALIDATION
+    if (q.type === "radio") {
+      let selected = document.querySelector(`input[name="q${index}"]:checked`);
+      if (q.required && !selected) {
+        error.textContent = "Please select one option";
+        valid = false;
+      }
+    }
+
+    // CHECKBOX VALIDATION
+    if (q.type === "checkbox") {
+      let checked = document.querySelectorAll(`input[name="q${index}"]:checked`);
+      if (checked.length < q.minSelect || checked.length > q.maxSelect) {
+        error.textContent =
+          `Select between ${q.minSelect} and ${q.maxSelect} options`;
+        valid = false;
+      }
+    }
+  });
+
+  if (valid) {
+    alert("Survey Submitted Successfully!");
+  }
+}
+</script>
+
+</body>
+</html>

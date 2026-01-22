@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dynamic Registration</title>
+  <style>
+    .error { color: red; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+<form id="regForm">
+  Name: <input type="text" id="name"><br><br>
+  Email: <input type="email" id="email"><span id="emailErr" class="error"></span><br><br>
+
+  Password: <input type="password" id="password"><span id="passErr" class="error"></span><br><br>
+  Confirm Password: <input type="password" id="confirm"><br><br>
+
+  Age: <input type="number" id="age"><br><br>
+
+  Role:
+  <select id="role" onchange="roleValidation()">
+    <option value="">Select</option>
+    <option>Student</option>
+    <option>Teacher</option>
+    <option>Admin</option>
+  </select><br><br>
+
+  Skills: <input type="text" id="skills"><br><br>
+
+  <button type="submit">Register</button>
+</form>
+
+<script>
+function roleValidation() {
+  let role = document.getElementById("role").value;
+  let pass = document.getElementById("password");
+
+  pass.placeholder = role === "Admin"
+    ? "Min 8 chars, uppercase, number"
+    : "Min 6 chars";
+}
+
+document.getElementById("password").addEventListener("input", function () {
+  let pass = this.value;
+  let role = document.getElementById("role").value;
+  let error = document.getElementById("passErr");
+
+  if (role === "Admin" && !/(?=.*[A-Z])(?=.*\d).{8,}/.test(pass)) {
+    error.textContent = "Weak admin password";
+  } else {
+    error.textContent = "";
+  }
+});
+
+document.getElementById("email").addEventListener("blur", function () {
+  let email = this.value;
+  let err = document.getElementById("emailErr");
+  err.textContent = email.endsWith("@vitap.ac.in") ? "" : "Invalid domain";
+});
+
+document.getElementById("regForm").onsubmit = function (e) {
+  e.preventDefault();
+  alert("Registration Successful");
+};
+</script>
+
+</body>
+</html>
