@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Record System (JSON)</title>
+    <style>
+        table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; }
+    </style>
+</head>
+<body>
+
+<h2>Student Record System</h2>
+
+<form id="studentForm">
+    <input type="text" id="id" placeholder="ID" required>
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="text" id="course" placeholder="Course" required>
+    <input type="number" id="marks" placeholder="Marks" required>
+    <button type="submit">Add Student</button>
+</form>
+
+<p id="msg"></p>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Course</th>
+            <th>Marks</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="studentTable"></tbody>
+</table>
+
+<script>
+let students = [];
+
+function loadStudents() {
+    fetch("students.json")
+        .then(res => res.json())
+        .then(data => {
+            students = data.students;
+            displayStudents();
+        })
+        .catch(() => {
+            document.getElementById("msg").textContent = "JSON Parsing Error!";
+        });
+}
+
+function displayStudents() {
+    const table = document.getElementById("studentTable");
+    table.innerHTML = "";
+
+    students.forEach((student, index) => {
+        table.innerHTML += `
+            <tr>
+                <td>${student.id}</td>
+                <td>${student.name}</td>
+                <td>${student.course}</td>
+                <td>${student.marks}</td>
+                <td>
+                    <button onclick="editStudent(${index})">Edit</button>
+                    <button onclick="deleteStudent(${index})">Delete</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+document.getElementById("studentForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const newStudent = {
+        id: document.getElementById("id").value,
+        name: document.getElementById("name").value,
+        course: document.getElementById("course").value,
+        marks: document.getElementById("marks").value
+    };
+
+    students.push(newStudent);
+    displayStudents();
+    document.getElementById("msg").textContent = "Student Added Successfully";
+    this.reset();
+});
+
+function deleteStudent(index) {
+    students.splice(index, 1);
+    displayStudents();
+    document.getElementById("msg").textContent = "Student Deleted";
+}
+
+function editStudent(index) {
+    const student = students[index];
+
+    document.getElementById("id").value = student.id;
+    document.getElementById("name").value = student.name;
+    document.getElementById("course").value = student.course;
+    document.getElementById("marks").value = student.marks;
+
+    students.splice(index, 1);
+    displayStudents();
+}
+
+loadStudents();
+</script>
+
+</body>
+</html>

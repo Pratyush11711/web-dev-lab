@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Management (XML)</title>
+    <style>
+        table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; }
+    </style>
+</head>
+<body>
+
+<h2>Employee Management System</h2>
+
+<form id="empForm">
+    <input type="text" id="id" placeholder="Employee ID" required>
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="text" id="dept" placeholder="Department" required>
+    <input type="number" id="salary" placeholder="Salary" required>
+    <button type="submit">Add Employee</button>
+</form>
+
+<p id="msg"></p>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Salary</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="empTable"></tbody>
+</table>
+
+<script>
+let xmlDoc;
+
+function loadEmployees() {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "employees.xml", true);
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            xmlDoc = xhr.responseXML;
+            displayEmployees();
+        } else {
+            document.getElementById("msg").textContent = "Error loading XML (404/500)";
+        }
+    };
+
+    xhr.onerror = function() {
+        document.getElementById("msg").textContent = "Malformed or Empty XML";
+    };
+
+    xhr.send();
+}
+
+function displayEmployees() {
+    const table = document.getElementById("empTable");
+    table.innerHTML = "";
+
+    const employees = xmlDoc.getElementsByTagName("employee");
+
+    for (let i = 0; i < employees.length; i++) {
+        const id = employees[i].getElementsByTagName("id")[0].textContent;
+        const name = employees[i].getElementsByTagName("name")[0].textContent;
+        const dept = employees[i].getElementsByTagName("department")[0].textContent;
+        const salary = employees[i].getElementsByTagName("salary")[0].textContent;
+
+        table.innerHTML += `
+            <tr>
+                <td>${id}</td>
+                <td>${name}</td>
+                <td>${dept}</td>
+                <td>${salary}</td>
+                <td>
+                    <button onclick="deleteEmployee(${i})">Delete</button>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+document.getElementById("empForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const idInput = document.getElementById("id");
+    const nameInput = document.getElementById("name");
+    const deptInput = document.getElementById("dept");
+    const salaryInput = document.getElementById("salary");
+
+    const employee = xmlDoc.createElement("employee");
+
+    employee.innerHTML = `
+        <id>${idInput.value}</id>
+        <name>${nameInput.value}</name>
+        <department>${deptInput.value}</department>
+        <salary>${salaryInput.value}</salary>
+    `;
+
+    xmlDoc.getElementsByTagName("employees")[0].appendChild(employee);
+
+    displayEmployees();
+    document.getElementById("msg").textContent = "Employee Added (200)";
+    this.reset();
+});
+
+function deleteEmployee(index) {
+    const employees = xmlDoc.getElementsByTagName("employee");
+    employees[index].remove();
+    displayEmployees();
+    document.getElementById("msg").textContent = "Employee Deleted (200)";
+}
+
+loadEmployees();
+</script>
+
+</body>
+</html>
