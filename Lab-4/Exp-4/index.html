@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather Dashboard</title>
+</head>
+<body>
+
+<h2>Weather Dashboard</h2>
+
+<input type="text" id="city" placeholder="Enter city name">
+<button onclick="getWeather()">Get Weather</button>
+
+<p id="loading"></p>
+<div id="weatherResult"></div>
+
+<script>
+let cache = {};
+
+function getWeather() {
+    const city = document.getElementById("city").value;
+    const resultDiv = document.getElementById("weatherResult");
+    const loading = document.getElementById("loading");
+
+    if (cache[city]) {
+        displayWeather(cache[city]);
+        return;
+    }
+
+    loading.textContent = "Loading...";
+
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=YOUR_API_KEY&units=metric`)
+        .then(res => {
+            if (!res.ok) throw new Error("City not found (404)");
+            return res.json();
+        })
+        .then(data => {
+            cache[city] = data;
+            displayWeather(data);
+            loading.textContent = "";
+        })
+        .catch(err => {
+            loading.textContent = "";
+            resultDiv.innerHTML = `<p style="color:red">${err.message}</p>`;
+        });
+}
+
+function displayWeather(data) {
+    const resultDiv = document.getElementById("weatherResult");
+
+    resultDiv.innerHTML = `
+        <h3>${data.name}</h3>
+        <p>Temperature: ${data.main.temp} °C</p>
+        <p>Humidity: ${data.main.humidity}%</p>
+        <p>Condition: ${data.weather[0].description}</p>
+    `;
+}
+</script>
+
+</body>
+</html>

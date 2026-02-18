@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Search</title>
+</head>
+<body>
+
+<h2>Live Product Search</h2>
+<input type="text" id="search" placeholder="Search product...">
+<div id="results"></div>
+
+<script>
+const searchInput = document.getElementById("search");
+const resultsDiv = document.getElementById("results");
+
+let timeout = null;
+
+searchInput.addEventListener("input", function() {
+    clearTimeout(timeout);
+    timeout = setTimeout(searchProducts, 500);
+});
+
+function searchProducts() {
+    const query = searchInput.value.toLowerCase();
+
+    fetch("products.json")
+        .then(res => res.json())
+                .then(data => {
+            const filtered = data.products.filter(product =>
+                product.name.toLowerCase().includes(query)
+            );
+
+            resultsDiv.innerHTML = "";
+
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = "<p>No results found</p>";
+                return;
+            }
+
+            filtered.forEach(product => {
+                const div = document.createElement("div");
+                div.innerHTML = `
+                    <h4>${product.name}</h4>
+                    <p>Price: ₹${product.price}</p>
+                    <p>Category: ${product.category}</p>
+                    <hr>
+                `;
+                resultsDiv.appendChild(div);
+            });
+        })
+        .catch(() => {
+            resultsDiv.innerHTML = "<p>Error fetching products</p>";
+        });
+}
+</script>
+
+</body>
+</html>
+
