@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Online Book Finder</title>
+</head>
+
+<body>
+
+<h2>Book Finder</h2>
+
+<input id="search" placeholder="Search Book Title">
+<button onclick="searchBook()">Search</button>
+
+<button onclick="programming()">Programming Books</button>
+<button onclick="sortPrice()">Sort by Price</button>
+<button onclick="sortRating()">Sort by Rating</button>
+<button onclick="topBooks()">Top Rated</button>
+
+<h3>Books</h3>
+
+<div id="books"></div>
+
+
+<script>
+
+function display(data){
+
+let html="";
+
+data.forEach(b=>{
+
+html+=`
+<div>
+<h3>${b.title}</h3>
+<p>Author: ${b.author}</p>
+<p>Category: ${b.category}</p>
+<p>Price: ${b.price}</p>
+<p>Rating: ${b.rating}</p>
+</div>
+<hr>
+`;
+
+});
+
+document.getElementById("books").innerHTML=html;
+
+}
+
+
+async function searchBook(){
+
+let title=document.getElementById("search").value;
+
+let res=await fetch(`/books/search?title=${title}`);
+
+let data=await res.json();
+
+display(data);
+
+}
+
+
+async function programming(){
+
+let res=await fetch(`/books/category/Programming`);
+
+let data=await res.json();
+
+display(data);
+
+}
+
+
+async function sortPrice(){
+
+let res=await fetch(`/books/sort/price`);
+
+let data=await res.json();
+
+display(data);
+
+}
+
+
+async function sortRating(){
+
+let res=await fetch(`/books/sort/rating`);
+
+let data=await res.json();
+
+display(data);
+
+}
+
+
+async function topBooks(){
+
+let res=await fetch(`/books/top`);
+
+let data=await res.json();
+
+display(data);
+
+}
+
+</script>
+
+</body>
+</html>
